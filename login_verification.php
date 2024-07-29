@@ -64,16 +64,12 @@
 			header("location:admin?go=dashboard");
 			break;
 
-		case 'pengelola_surat':
-			header("location:pengelola_surat/?go=dashboard");
+		case 'sales':
+			header("location:sales/?go=dashboard");
 			break;
 
-		case 'kepala_desa':
-			header("location:kepala_desa/?go=dashboard");
-			break;
-
-		case 'sekretaris_desa':
-			header("location:sekretaris_desa/?go=dashboard");
+		case 'supervisor':
+			header("location:supervisor/?go=dashboard");
 			break;
 		
 		default:
