@@ -116,6 +116,7 @@ else :
                           <?php elseif ($barang['satuan'] === 'pcs'): ?>
                             <span class="text-success"><?= $barang['satuan'] ?></span>
                           <?php endif ?>
+                        </td>
                         <td>
                           <button class="btn btn-datatable btn-icon btn-transparent-dark me-2 toggle_modal_ubah"
                             data-id_barang="<?= $barang['id_barang'] ?>" 
