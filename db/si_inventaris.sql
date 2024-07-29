@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 29, 2024 at 08:48 PM
+-- Generation Time: Jul 30, 2024 at 12:51 AM
 -- Server version: 10.4.20-MariaDB
 -- PHP Version: 8.0.8
 
@@ -30,10 +30,23 @@ SET time_zone = "+00:00";
 CREATE TABLE `tbl_barang` (
   `id` int(10) UNSIGNED NOT NULL,
   `kode_barang` varchar(10) NOT NULL,
-  `nama_barang` varchar(25) NOT NULL,
+  `nama_barang` varchar(128) NOT NULL,
+  `satuan` enum('dus','box','pcs') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tbl_barang`
+--
+
+INSERT INTO `tbl_barang` (`id`, `kode_barang`, `nama_barang`, `satuan`, `created_at`, `updated_at`) VALUES
+(1, '300175', 'Nabati RCO 43g GT (60pcs) PKU', 'pcs', '2024-07-29 19:06:49', '2024-07-29 19:57:47'),
+(2, '300090', 'Nabati RCE 43g GT (60pcs) PKU', 'pcs', '2024-07-29 19:10:40', '2024-07-29 19:57:47'),
+(3, '300360', 'Nabati PLV 39g GT (60pcs)', 'pcs', '2024-07-29 19:10:40', NULL),
+(4, '300982', 'Nabati GGM 39g GT (60pcs)', 'pcs', '2024-07-29 19:10:40', NULL),
+(5, '300089', 'Nabati RCE 17g GT (10pcs x 12bal) PKU', 'pcs', '2024-07-29 19:10:40', '2024-07-29 19:57:47'),
+(6, '302020', 'Rolls RCE 6g GT (21pcs x 6ib) PKU', 'dus', '2024-07-29 19:36:37', '2024-07-29 19:57:52');
 
 -- --------------------------------------------------------
 
@@ -42,13 +55,22 @@ CREATE TABLE `tbl_barang` (
 --
 
 CREATE TABLE `tbl_barang_keluar` (
-  `id` int(11) NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
   `id_barang` int(10) UNSIGNED NOT NULL,
   `tanggal` date NOT NULL,
   `jumlah` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tbl_barang_keluar`
+--
+
+INSERT INTO `tbl_barang_keluar` (`id`, `id_barang`, `tanggal`, `jumlah`, `created_at`, `updated_at`) VALUES
+(1, 6, '2024-07-30', 2, '2024-07-29 20:26:41', NULL),
+(3, 5, '2024-07-30', 3, '2024-07-29 20:29:12', NULL),
+(4, 4, '2024-07-30', 3, '2024-07-29 20:29:23', NULL);
 
 -- --------------------------------------------------------
 
@@ -57,7 +79,7 @@ CREATE TABLE `tbl_barang_keluar` (
 --
 
 CREATE TABLE `tbl_barang_masuk` (
-  `id` int(11) NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
   `id_barang` int(10) UNSIGNED NOT NULL,
   `tanggal` date NOT NULL,
   `jumlah` int(11) NOT NULL,
@@ -65,6 +87,17 @@ CREATE TABLE `tbl_barang_masuk` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tbl_barang_masuk`
+--
+
+INSERT INTO `tbl_barang_masuk` (`id`, `id_barang`, `tanggal`, `jumlah`, `keterangan`, `created_at`, `updated_at`) VALUES
+(2, 5, '2024-07-30', 5, 'test', '2024-07-29 20:02:51', NULL),
+(3, 4, '2024-07-30', 5, 'Tambah stok', '2024-07-29 20:03:07', NULL),
+(4, 2, '2024-07-30', 1, '23', '2024-07-29 20:04:27', NULL),
+(5, 4, '2024-07-30', 25, 'Masuk pagi ini', '2024-07-29 20:08:21', NULL),
+(7, 6, '2024-07-30', 3, 'Tambah', '2024-07-29 20:10:45', '2024-07-29 20:11:32');
 
 -- --------------------------------------------------------
 
@@ -113,10 +146,9 @@ CREATE TABLE `tbl_pegawai` (
 --
 
 INSERT INTO `tbl_pegawai` (`id`, `id_pengguna`, `id_jabatan`, `nip`, `nama_pegawai`, `jk`, `alamat`, `tmp_lahir`, `tgl_lahir`, `foto_profil`, `created_at`, `updated_at`) VALUES
-(1, NULL, 1, '1234567890123456', 'Test Kepala Desa', 'l', 'Palembang', 'Palembang', '1997-01-05', '', '2024-07-21 07:05:18', '2024-07-22 05:42:36'),
-(2, NULL, NULL, '6818385748000934', 'Test Pengelola Surat', 'l', 'Palembang', 'Palembang', '2024-07-09', '4a2f39f7a9ed0aaf792177c12ef542dd23d122e63ae62c1c94349657b96a90b0.jpg', '2024-07-21 07:17:08', '2024-07-29 16:37:59'),
-(15, NULL, NULL, '4635889616676390', 'Test Tanpa Hak Akses', 'l', 'Palembang', 'Palembang', '1995-01-01', '', '2024-07-21 07:42:04', '2024-07-22 05:50:31'),
-(16, NULL, 2, '1147471733743553', 'Test Sekretaris Desa', 'p', 'Griya Agung', 'Banyuasin', '2024-07-07', '', '2024-07-22 06:00:29', NULL);
+(2, 11, 2, '6818385748000934', 'Test Supervisor', 'l', 'Palembang', 'Palembang', '2024-07-09', '689dc007f10c67ac59732cb9e1c4612fd22c927510cf84c288328fc5fe12cc91.jpg', '2024-07-21 07:17:08', '2024-07-29 22:47:28'),
+(15, 12, 1, '4635889616676390', 'Test Sales', 'p', 'Palembang', 'Palembang', '1995-01-01', '802b881451ba17ac9dd7018ded7394eacc03ec510cf6ba2953a21615ae7df21f.jpg', '2024-07-21 07:42:04', '2024-07-29 22:43:17'),
+(17, NULL, 1, '1234567890987654', 'Test Tanpa Hak Akses', 'l', 'Kertapati', 'Palembang', '2024-07-15', '', '2024-07-29 19:34:25', '2024-07-29 20:52:28');
 
 -- --------------------------------------------------------
 
@@ -138,7 +170,9 @@ CREATE TABLE `tbl_pengguna` (
 --
 
 INSERT INTO `tbl_pengguna` (`id`, `username`, `password`, `hak_akses`, `created_at`, `last_login`) VALUES
-(9, 'admin', '$2y$10$r6i9ouw57cTTevcboVpfxuaaeGE.LqvH0ivtFunGnpjhus3jtxu1q', 'admin', '2024-06-10 14:42:24', '2024-07-29 11:22:20');
+(9, 'admin', '$2y$10$r6i9ouw57cTTevcboVpfxuaaeGE.LqvH0ivtFunGnpjhus3jtxu1q', 'admin', '2024-06-10 14:42:24', '2024-07-29 17:16:31'),
+(11, '6818385748000934', '$2y$10$fDFq6UfhrLqm3D/3rFc3LeI0Fhd5C.1SO5RIwakdB4RpQQqTkt/Q6', 'supervisor', '2024-07-29 19:33:40', '2024-07-29 17:46:35'),
+(12, '4635889616676390', '$2y$10$KlRnQJ5qLxONs6ToXlIPeOpLUxpqidSfm.UZ77spa4apzNeQHi/ZG', 'sales', '2024-07-29 19:33:56', '2024-07-29 17:46:33');
 
 --
 -- Indexes for dumped tables
@@ -154,12 +188,14 @@ ALTER TABLE `tbl_barang`
 -- Indexes for table `tbl_barang_keluar`
 --
 ALTER TABLE `tbl_barang_keluar`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `id_barang` (`id_barang`);
 
 --
 -- Indexes for table `tbl_barang_masuk`
 --
 ALTER TABLE `tbl_barang_masuk`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `id_barang` (`id_barang`);
 
 --
@@ -192,7 +228,19 @@ ALTER TABLE `tbl_pengguna`
 -- AUTO_INCREMENT for table `tbl_barang`
 --
 ALTER TABLE `tbl_barang`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tbl_barang_keluar`
+--
+ALTER TABLE `tbl_barang_keluar`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `tbl_barang_masuk`
+--
+ALTER TABLE `tbl_barang_masuk`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tbl_jabatan`
@@ -204,13 +252,13 @@ ALTER TABLE `tbl_jabatan`
 -- AUTO_INCREMENT for table `tbl_pegawai`
 --
 ALTER TABLE `tbl_pegawai`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tbl_pengguna`
 --
 ALTER TABLE `tbl_pengguna`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables
