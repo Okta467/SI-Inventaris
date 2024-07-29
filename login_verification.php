@@ -41,7 +41,7 @@
 	}
 
     // Get id_pegawai if hak akses is pengelola_surat, pegawai, or sekretaris_desa
-    if (in_array($user['hak_akses'], ['pengelola_surat', 'kepala_desa', 'sekretaris_desa'])) {
+    if (in_array($user['hak_akses'], ['sales', 'supervisor'])) {
         $query_pegawai = mysqli_query($connection, "SELECT id, nama_pegawai FROM tbl_pegawai WHERE id_pengguna = {$user['id']} LIMIT 1");
         $pegawai = mysqli_fetch_assoc($query_pegawai);
     }

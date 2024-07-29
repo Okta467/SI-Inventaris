@@ -1,6 +1,22 @@
 <?php
 $user_logged_in = $_SESSION['nama_pegawai'] ?? $_SESSION['nama_guest'] ?? $_SESSION['username'];
 $email_user_logged_in = $_SESSION['email'];
+$id_pegawai = $_SESSION['id_pegawai'];
+
+$stmt_pegawai = mysqli_stmt_init($connection);
+
+mysqli_stmt_prepare($stmt_pegawai, "SELECT foto_profil FROM tbl_pegawai WHERE id=?");
+mysqli_stmt_bind_param($stmt_pegawai, 'i', $id_pegawai);
+mysqli_stmt_execute($stmt_pegawai);
+
+$result = mysqli_stmt_get_result($stmt_pegawai);
+$pegawai = mysqli_fetch_assoc($result);
+
+$path_foto_profil = $pegawai['foto_profil']
+  ? base_url_return("assets/uploads/foto_profil/{$pegawai['foto_profil']}")
+  : base_url_return('assets/img/illustrations/profiles/profile-1.png');
+
+mysqli_stmt_close($stmt_pegawai);
 ?>
 
 <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-white" id="sidenavAccordion">
@@ -84,19 +100,19 @@ $email_user_logged_in = $_SESSION['email'];
         </li>
         <!-- User Dropdown-->
         <li class="nav-item dropdown no-caret dropdown-user me-3 me-lg-4">
-            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="img-fluid" src="../assets/img/illustrations/profiles/profile-1.png" /></a>
+            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="img-fluid" src="<?= $path_foto_profil ?>" /></a>
             <div class="dropdown-menu dropdown-menu-end border-0 shadow animated--fade-in-up" aria-labelledby="navbarDropdownUserImage">
                 <h6 class="dropdown-header d-flex align-items-center">
-                    <img class="dropdown-user-img" src="../assets/img/illustrations/profiles/profile-1.png" />
+                    <img class="dropdown-user-img" src="<?= $path_foto_profil ?>" />
                     <div class="dropdown-user-details">
                         <div class="dropdown-user-details-name"><?= $user_logged_in ?></div>
                         <div class="dropdown-user-details-email"><?= $email_user_logged_in ?></div>
                     </div>
                 </h6>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#!">
+                <a class="dropdown-item" href="profil.php?go=profil">
                     <div class="dropdown-item-icon"><i data-feather="settings"></i></div>
-                    Account
+                    Akun Saya
                 </a>
                 <a class="dropdown-item" href="<?= base_url('logout.php') ?>">
                     <div class="dropdown-item-icon"><i data-feather="log-out"></i></div>
