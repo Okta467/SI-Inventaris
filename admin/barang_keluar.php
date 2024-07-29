@@ -54,6 +54,31 @@ else :
 
             </div>
             
+            <!-- Tools Cetak Laporan -->
+            <div class="card mb-4 mt-5">
+              <div class="card-header">
+                <div>
+                  <i data-feather="settings" class="me-2 mt-1"></i>
+                  Tools Cetak Laporan
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row gx-3">
+                  <div class="col-md-2 mb-3">
+                    <label class="small mb-1" for="xtanggal_kirim">Tanggal</label>
+                    <input class="form-control" id="xtanggal_kirim" type="date" name="xtanggal_kirim" required>
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label class="small mb-1 invisible" for="xcetak_laporan">Filter Button</label>
+                    <button class="btn btn-primary w-100" id="xcetak_laporan" type="button">
+                      <i data-feather="printer" class="me-1"></i>
+                      Cetak
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <!-- Main page content-->
             <div class="card card-header-actions mb-4 mt-5">
               <div class="card-header">
@@ -222,6 +247,15 @@ else :
     <!-- PAGE SCRIPT -->
     <script>
       $(document).ready(function() {
+        
+        $('#xcetak_laporan').on('click', function() {
+          const tanggal_kirim = $('#xtanggal_kirim').val();
+          const url = `laporan_barang_keluar.php?tanggal_kirim=${tanggal_kirim}`;
+          
+          printExternal(url);
+        });
+
+
         $('.toggle_modal_tambah').on('click', function() {
           $('#ModalInputBarangMasuk .modal-title').html(`<i data-feather="plus-circle" class="me-2 mt-1"></i>Tambah Barang Keluar`);
           $('#ModalInputBarangMasuk form').attr({action: 'barang_keluar_tambah.php', method: 'post'});
