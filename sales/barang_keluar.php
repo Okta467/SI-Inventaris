@@ -1,7 +1,7 @@
 <?php
 include '../helpers/isAccessAllowedHelper.php';
 
-// cek apakah user yang mengakses adalah admin?
+// cek apakah user yang mengakses adalah sales?
 if (!isAccessAllowed('sales')) :
   session_destroy();
   echo "<meta http-equiv='refresh' content='0;" . base_url_return('index.php?msg=other_error') . "'>";
@@ -52,6 +52,31 @@ else :
                 <input class="form-control ps-0 pointer" id="litepickerRangePlugin" value="Tanggal: <?= date('d M Y') ?>" readonly />
               </div>
 
+            </div>
+            
+            <!-- Tools Cetak Laporan -->
+            <div class="card mb-4 mt-5">
+              <div class="card-header">
+                <div>
+                  <i data-feather="settings" class="me-2 mt-1"></i>
+                  Tools Cetak Laporan
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row gx-3">
+                  <div class="col-md-2 mb-3">
+                    <label class="small mb-1" for="xtanggal_kirim">Tanggal</label>
+                    <input class="form-control" id="xtanggal_kirim" type="date" name="xtanggal_kirim" required>
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label class="small mb-1 invisible" for="xcetak_laporan">Filter Button</label>
+                    <button class="btn btn-primary w-100" id="xcetak_laporan" type="button">
+                      <i data-feather="printer" class="me-1"></i>
+                      Cetak
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <!-- Main page content-->
@@ -151,8 +176,15 @@ else :
             <div class="modal-body">
               
               <input type="hidden" id="xid_barang_keluar" name="xid_barang_keluar">
+              <input type="hidden" id="xcurrent_id_barang" name="xcurrent_id_barang">
+
+              <div class="mb-3 d-none" id="xid_barang_display_container">
+                <label class="small mb-1" for="xid_barang_display">Barang</label>
+                <input type="text" name="xid_barang_display" class="form-control" id="xid_barang_display" readonly>
+                <small class="text-danger">Stok barang yang dipilih 0, Anda hanya dapat mengubah tanggal atau menghapus data barang keluar ini.</small>
+              </div>
               
-              <div class="mb-3">
+              <div class="mb-3" id="xid_barang_container">
                 <label class="small mb-1" for="xid_barang">Barang</label>
                 <select name="xid_barang" class="form-control select2" id="xid_barang" required>
                   <option value="">-- Pilih --</option>
@@ -224,9 +256,45 @@ else :
     <script>
       $(document).ready(function() {
 
+        const handleStokBarangZero = function (isStokZero = false, barangDisplayText = '') {
+          if (isStokZero) {
+            $('#xjumlah').prop('readonly', true);
+            
+            $('#xid_barang').prop('required', false);
+            $('#xid_barang_container').addClass('d-none');
+            
+            $('#xid_barang_display').val(barangDisplayText);
+            $('#xid_barang_display_container').removeClass('d-none');
+          } else {
+            $('#xjumlah').prop('readonly', false);
+  
+            $('#xid_barang').prop('required', true);
+            $('#xid_barang_container').removeClass('d-none');
+  
+            $('#xid_barang_display').val(barangDisplayText);
+            $('#xid_barang_display_container').addClass('d-none');
+          }
+        }
+        
+        $('#xcetak_laporan').on('click', function() {
+          const tanggal_kirim = $('#xtanggal_kirim').val();
+          const url = `laporan_barang_keluar.php?tanggal_kirim=${tanggal_kirim}`;
+          
+          printExternal(url);
+        });
+
+
         $('.toggle_modal_tambah').on('click', function() {
           $('#ModalInputBarangMasuk .modal-title').html(`<i data-feather="plus-circle" class="me-2 mt-1"></i>Tambah Barang Keluar`);
           $('#ModalInputBarangMasuk form').attr({action: 'barang_keluar_tambah.php', method: 'post'});
+          
+          let isStokZero = false;
+          let barangDisplayText = '';
+
+          handleStokBarangZero(isStokZero, barangDisplayText);
+
+          // Set input barang to default
+          $('#xid_barang').val('').trigger('change');
 
           // Re-init all feather icons
           feather.replace();
@@ -237,15 +305,44 @@ else :
 
         $('.toggle_modal_ubah').on('click', function() {
           const data = $(this).data();
-          
+
           $('#ModalInputBarangMasuk .modal-title').html(`<i data-feather="edit" class="me-2 mt-1"></i>Ubah Barang Keluar`);
           $('#ModalInputBarangMasuk form').attr({action: 'barang_keluar_ubah.php', method: 'post'});
+          
+          $.ajax({
+            url: 'get_barang_and_stok.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+              'id_barang': data.id_barang
+            },
+            success: function(data) {
+              const barang = data[0];
 
+              if (barang.stok <= 0) {
+                let isStokZero = true;
+                let barangDisplayText = `${barang.nama_barang} -- ${barang.kode_barang} -- Stok (${barang.stok})`;
+
+                handleStokBarangZero(isStokZero, barangDisplayText);
+              } else {
+                let isStokZero = false;
+                let barangDisplayText = '';
+
+                handleStokBarangZero(isStokZero, barangDisplayText);
+              }
+            },
+            error: function(request, status, error) {
+              // console.log("ajax call went wrong:" + request.responseText);
+              console.log("ajax call went wrong:" + error);
+            }
+          });
+          
           $('#ModalInputBarangMasuk #xid_barang_keluar').val(data.id_barang_keluar);
+          $('#ModalInputBarangMasuk #xcurrent_id_barang').val(data.id_barang);
           $('#ModalInputBarangMasuk #xid_barang').val(data.id_barang).trigger('change');
           $('#ModalInputBarangMasuk #xtanggal').val(data.tanggal);
           $('#ModalInputBarangMasuk #xjumlah').val(data.jumlah);
-
+          
           // Re-init all feather icons
           feather.replace();
           
@@ -260,7 +357,7 @@ else :
           
           Swal.fire({
             title: "Konfirmasi Tindakan?",
-            html: `<div class="mb-1">Hapus data barang masuk: </div><strong>${nama_barang} (Jumlah masuk ${jumlah})?</strong>`,
+            html: `<div class="mb-1">Hapus data barang keluar: </div><strong>${nama_barang} (Jumlah keluar ${jumlah})?</strong>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
