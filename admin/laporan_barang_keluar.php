@@ -20,9 +20,9 @@ else :
     "SELECT
       a.id AS id_barang_keluar, a.tanggal, a.jumlah,
       b.id AS id_barang, b.kode_barang, b.nama_barang, b.satuan,
-      SUM(IF(b.satuan='pcs', 1, 0)) AS sml,
-      SUM(IF(b.satuan='box', 1, 0)) AS mid,
-      SUM(IF(b.satuan='dus', 1, 0)) AS lrg
+      SUM(IF(b.satuan='pcs', a.jumlah, 0)) AS sml,
+      SUM(IF(b.satuan='box', a.jumlah, 0)) AS mid,
+      SUM(IF(b.satuan='dus', a.jumlah, 0)) AS lrg
     FROM tbl_barang_keluar AS a
     INNER JOIN tbl_barang AS b
       ON b.id = a.id_barang
