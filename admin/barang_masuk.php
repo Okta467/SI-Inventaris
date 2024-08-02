@@ -123,6 +123,7 @@ else :
                           </button>
                           <button class="btn btn-datatable btn-icon btn-transparent-dark me-2 toggle_swal_hapus"
                             data-id_barang_masuk="<?= $barang_masuk['id_barang_masuk'] ?>"
+                            data-id_barang="<?= $barang_masuk['id_barang'] ?>"
                             data-nama_barang="<?= htmlspecialchars($barang_masuk['nama_barang']) ?>"
                             data-jumlah="<?= htmlspecialchars($barang_masuk['jumlah']) ?>">
                             <i class="fa fa-trash-can"></i>
@@ -237,12 +238,18 @@ else :
 
         $('#datatablesSimple').on('click', '.toggle_swal_hapus', function() {
           const id_barang_masuk = $(this).data('id_barang_masuk');
+          const id_barang = $(this).data('id_barang');
           const nama_barang = $(this).data('nama_barang');
           const jumlah = $(this).data('jumlah');
+          const warning_html = 
+            `<div class="mb-1">Hapus data barang masuk: </div><strong>${nama_barang} (Jumlah masuk ${jumlah})?</strong>
+            <div class="text-danger small mt-4">Data tidak bisa dihapus jika:</div>
+            <div class="text-danger small mt-1">(Stok - jumlah barang masuk ini) < 0</div>
+            <div class="text-danger small mt-1">Harap hapus data keluar sampai jumlah stok mencukupi.</div>`;
           
           Swal.fire({
             title: "Konfirmasi Tindakan?",
-            html: `<div class="mb-1">Hapus data barang masuk: </div><strong>${nama_barang} (Jumlah masuk ${jumlah})?</strong>`,
+            html: warning_html,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -256,7 +263,7 @@ else :
                 icon: "success",
                 timer: 3000
               }).then(() => {
-                window.location = `barang_masuk_hapus.php?xid_barang_masuk=${id_barang_masuk}`;
+                window.location = `barang_masuk_hapus.php?xid_barang=${id_barang}&xid_barang_masuk=${id_barang_masuk}`;
               });
             }
           });
