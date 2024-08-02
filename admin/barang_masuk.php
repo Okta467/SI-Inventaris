@@ -182,6 +182,7 @@ else :
               <div class="mb-3">
                 <label class="small mb-1" for="xjumlah">Jumlah</label>
                 <input type="number" name="xjumlah" min="0" class="form-control" id="xjumlah" placeholder="Enter jumlah" required />
+                <small class="text-danger">Perhatian: Jika mengurangi jumlah, tidak diperbolehkan menghasilkan stok barang < 0, yaitu (stok - (jumlah saat ini - jumlah pada input)).</small>
               </div>
             
               <div class="mb-3">
