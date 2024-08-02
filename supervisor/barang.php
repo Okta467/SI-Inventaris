@@ -1,7 +1,7 @@
 <?php
 include '../helpers/isAccessAllowedHelper.php';
 
-// cek apakah user yang mengakses adalah admin?
+// cek apakah user yang mengakses adalah supervisor?
 if (!isAccessAllowed('supervisor')) :
   session_destroy();
   echo "<meta http-equiv='refresh' content='0;" . base_url_return('index.php?msg=other_error') . "'>";
@@ -61,6 +61,7 @@ else :
                   <i data-feather="package" class="me-2 mt-1"></i>
                   Data Barang
                 </div>
+                <button class="btn btn-sm btn-primary toggle_modal_tambah" type="button"><i data-feather="plus-circle" class="me-2"></i>Tambah Data</button>
               </div>
               <div class="card-body">
                 <table id="datatablesSimple">
@@ -71,6 +72,7 @@ else :
                       <th>Nama Barang</th>
                       <th>Stok</th>
                       <th>Satuan</th>
+                      <th>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -115,6 +117,20 @@ else :
                             <span class="text-success"><?= $barang['satuan'] ?></span>
                           <?php endif ?>
                         </td>
+                        <td>
+                          <button class="btn btn-datatable btn-icon btn-transparent-dark me-2 toggle_modal_ubah"
+                            data-id_barang="<?= $barang['id_barang'] ?>" 
+                            data-kode_barang="<?= htmlspecialchars($barang['kode_barang']) ?>" 
+                            data-nama_barang="<?= htmlspecialchars($barang['nama_barang']) ?>"
+                            data-satuan="<?= $barang['satuan'] ?>">
+                            <i class="fa fa-pen-to-square"></i>
+                          </button>
+                          <button class="btn btn-datatable btn-icon btn-transparent-dark me-2 toggle_swal_hapus"
+                            data-id_barang="<?= $barang['id_barang'] ?>" 
+                            data-nama_barang="<?= htmlspecialchars($barang['nama_barang']) ?>">
+                            <i class="fa fa-trash-can"></i>
+                          </button>
+                        </td>
                       </tr>
 
                     <?php endwhile ?>
@@ -133,11 +149,116 @@ else :
       </div>
     </div>
     
+    <!--============================= MODAL INPUT BARANG =============================-->
+    <div class="modal fade" id="ModalInputBarang" tabindex="-1" role="dialog" aria-labelledby="ModalInputBarangTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ModalInputBarangTitle">Modal title</h5>
+            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form>
+            <div class="modal-body">
+              
+              <input type="hidden" id="xid_barang" name="xid_barang">
+            
+              <div class="mb-3">
+                <label class="small mb-1" for="xkode_barang">Kode Barang</label>
+                <input type="text" name="xkode_barang" maxlength="10" class="form-control" id="xkode_barang" placeholder="Enter kode barang" required />
+              </div>
+            
+              <div class="mb-3">
+                <label class="small mb-1" for="xnama_barang">Nama Barang</label>
+                <input type="text" name="xnama_barang" maxlength="128" class="form-control" id="xnama_barang" placeholder="Enter nama barang" required />
+              </div>
+              
+              <div class="mb-3">
+                <label class="small mb-1" for="xsatuan">Satuan</label>
+                <select name="xsatuan" class="form-control select2" id="xsatuan" required>
+                  <option value="">-- Pilih --</option>
+                  <option value="pcs">pcs</option>
+                  <option value="box">box</option>
+                  <option value="dus">dus</option>
+                </select>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-light border" type="button" data-bs-dismiss="modal">Batal</button>
+              <button class="btn btn-primary" type="submit">Simpan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--/.modal-input-barang -->
+    
     <?php include '_partials/script.php' ?>
     <?php include '../helpers/sweetalert2_notify.php' ?>
     
     <!-- PAGE SCRIPT -->
     <script>
+      $(document).ready(function() {
+        $('.toggle_modal_tambah').on('click', function() {
+          $('#ModalInputBarang .modal-title').html(`<i data-feather="plus-circle" class="me-2 mt-1"></i>Tambah Barang`);
+          $('#ModalInputBarang form').attr({action: 'barang_tambah.php', method: 'post'});
+
+          // Re-init all feather icons
+          feather.replace();
+          
+          $('#ModalInputBarang').modal('show');
+        });
+
+
+        $('.toggle_modal_ubah').on('click', function() {
+          const data = $(this).data();
+          
+          $('#ModalInputBarang .modal-title').html(`<i data-feather="edit" class="me-2 mt-1"></i>Ubah Barang`);
+          $('#ModalInputBarang form').attr({action: 'barang_ubah.php', method: 'post'});
+
+          $('#ModalInputBarang #xid_barang').val(data.id_barang);
+          $('#ModalInputBarang #xkode_barang').val(data.kode_barang);
+          $('#ModalInputBarang #xnama_barang').val(data.nama_barang);
+          $('#ModalInputBarang #xsatuan').val(data.satuan).trigger('change');
+
+          // Re-init all feather icons
+          feather.replace();
+          
+          $('#ModalInputBarang').modal('show');
+        });
+        
+
+        $('#datatablesSimple').on('click', '.toggle_swal_hapus', function() {
+          const id_barang   = $(this).data('id_barang');
+          const nama_barang = $(this).data('nama_barang');
+          const warning_html = 
+            `Hapus data barang: <strong>${nama_barang}?</strong>
+            <div class="text-danger small mt-4">Data yang terhubung (barang masuk dan keluar)</div>
+            <div class="text-danger small mt-1">juga akan dihapus!</div>`;
+          
+          Swal.fire({
+            title: "Konfirmasi Tindakan?",
+            html: warning_html,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, konfirmasi!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: "Tindakan Dikonfirmasi!",
+                text: "Halaman akan di-reload untuk memproses.",
+                icon: "success",
+                timer: 3000
+              }).then(() => {
+                window.location = `barang_hapus.php?xid_barang=${id_barang}`;
+              });
+            }
+          });
+        });
+        
+      });
     </script>
 
   </body>
