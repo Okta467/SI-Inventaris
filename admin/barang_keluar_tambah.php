@@ -34,8 +34,8 @@
             GROUP BY id_barang
         ) AS c
             ON a.id = c.id_barang
-        GROUP BY a.id
-        ORDER BY a.id DESC";
+        WHERE a.id=?
+        GROUP BY a.id";
 
     mysqli_stmt_prepare($stmt_barang, $query_barang);
     mysqli_stmt_bind_param($stmt_barang, 'i', $id_barang);
