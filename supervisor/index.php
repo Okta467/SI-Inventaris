@@ -1,7 +1,7 @@
 <?php
 include '../helpers/isAccessAllowedHelper.php';
 
-// cek apakah user yang mengakses adalah admin?
+// cek apakah user yang mengakses adalah supervisor?
 if (!isAccessAllowed('supervisor')) :
   session_destroy();
   echo "<meta http-equiv='refresh' content='0;" . base_url_return('index.php?msg=other_error') . "'>";
