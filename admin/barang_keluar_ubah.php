@@ -45,6 +45,12 @@
 
     $result = mysqli_stmt_get_result($stmt_barang);
     $barang = mysqli_fetch_assoc($result);
+
+    if (!$barang) {
+        $_SESSION['msg'] = 'Barang yang dipilih tidak ada!';
+        echo "<meta http-equiv='refresh' content='0;barang_keluar.php?go=barang_keluar'>";
+        return;
+    }
     
     if ($barang['stok'] > 0 && $jumlah > $barang['stok']) {
         $_SESSION['msg'] = 'Jumlah barang keluar tidak boleh melebihi stok!';
