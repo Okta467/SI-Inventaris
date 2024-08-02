@@ -30,7 +30,7 @@
     $stmt = mysqli_stmt_init($connection);
 
     mysqli_stmt_prepare($stmt, "UPDATE tbl_barang SET kode_barang=?, nama_barang=?, satuan=? WHERE id=?");
-    mysqli_stmt_bind_param($stmt, 'sssi', $kode_barang, $nama_barang, $sattuan, $id_barang);
+    mysqli_stmt_bind_param($stmt, 'sssi', $kode_barang, $nama_barang, $satuan, $id_barang);
 
     $update = mysqli_stmt_execute($stmt);
 
