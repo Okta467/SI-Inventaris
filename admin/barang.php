@@ -231,10 +231,14 @@ else :
         $('#datatablesSimple').on('click', '.toggle_swal_hapus', function() {
           const id_barang   = $(this).data('id_barang');
           const nama_barang = $(this).data('nama_barang');
+          const warning_html = 
+            `Hapus data barang: <strong>${nama_barang}?</strong>
+            <div class="text-danger small mt-4">Data yang terhubung (barang masuk dan keluar)</div>
+            <div class="text-danger small mt-1">juga akan dihapus!</div>`;
           
           Swal.fire({
             title: "Konfirmasi Tindakan?",
-            html: `Hapus data barang: <strong>${nama_barang}?</strong>`,
+            html: warning_html,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
