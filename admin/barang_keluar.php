@@ -176,8 +176,15 @@ else :
             <div class="modal-body">
               
               <input type="hidden" id="xid_barang_keluar" name="xid_barang_keluar">
+              <input type="hidden" id="xcurrent_id_barang" name="xcurrent_id_barang">
+
+              <div class="mb-3 d-none" id="xid_barang_display_container">
+                <label class="small mb-1" for="xid_barang_display">Barang</label>
+                <input type="text" name="xid_barang_display" class="form-control" id="xid_barang_display" readonly>
+                <small class="text-danger">Stok barang yang dipilih 0, Anda hanya dapat mengubah tanggal atau menghapus data barang keluar ini.</small>
+              </div>
               
-              <div class="mb-3">
+              <div class="mb-3" id="xid_barang_container">
                 <label class="small mb-1" for="xid_barang">Barang</label>
                 <select name="xid_barang" class="form-control select2" id="xid_barang" required>
                   <option value="">-- Pilih --</option>
@@ -248,6 +255,27 @@ else :
     <!-- PAGE SCRIPT -->
     <script>
       $(document).ready(function() {
+
+        const handleStokBarangZero = function (isStokZero = false, barangDisplayText = '') {
+          console.log(barangDisplayText);
+          if (isStokZero) {
+            $('#xjumlah').prop('readonly', true);
+            
+            $('#xid_barang').prop('required', false);
+            $('#xid_barang_container').addClass('d-none');
+            
+            $('#xid_barang_display').val(barangDisplayText);
+            $('#xid_barang_display_container').removeClass('d-none');
+          } else {
+            $('#xjumlah').prop('readonly', false);
+  
+            $('#xid_barang').prop('required', true);
+            $('#xid_barang_container').removeClass('d-none');
+  
+            $('#xid_barang_display').val(barangDisplayText);
+            $('#xid_barang_display_container').addClass('d-none');
+          }
+        }
         
         $('#xcetak_laporan').on('click', function() {
           const tanggal_kirim = $('#xtanggal_kirim').val();
@@ -260,6 +288,14 @@ else :
         $('.toggle_modal_tambah').on('click', function() {
           $('#ModalInputBarangMasuk .modal-title').html(`<i data-feather="plus-circle" class="me-2 mt-1"></i>Tambah Barang Keluar`);
           $('#ModalInputBarangMasuk form').attr({action: 'barang_keluar_tambah.php', method: 'post'});
+          
+          let isStokZero = false;
+          let barangDisplayText = '';
+
+          handleStokBarangZero(isStokZero, barangDisplayText);
+
+          // Set input barang to default
+          $('#xid_barang').val('').trigger('change');
 
           // Re-init all feather icons
           feather.replace();
@@ -270,15 +306,44 @@ else :
 
         $('.toggle_modal_ubah').on('click', function() {
           const data = $(this).data();
-          
+
           $('#ModalInputBarangMasuk .modal-title').html(`<i data-feather="edit" class="me-2 mt-1"></i>Ubah Barang Keluar`);
           $('#ModalInputBarangMasuk form').attr({action: 'barang_keluar_ubah.php', method: 'post'});
+          
+          $.ajax({
+            url: 'get_barang_and_stok.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+              'id_barang': data.id_barang
+            },
+            success: function(data) {
+              const barang = data[0];
 
+              if (barang.stok <= 0) {
+                let isStokZero = true;
+                let barangDisplayText = `${barang.nama_barang} -- ${barang.kode_barang} -- Stok (${barang.stok})`;
+
+                handleStokBarangZero(isStokZero, barangDisplayText);
+              } else {
+                let isStokZero = false;
+                let barangDisplayText = '';
+
+                handleStokBarangZero(isStokZero, barangDisplayText);
+              }
+            },
+            error: function(request, status, error) {
+              console.log("ajax call went wrong:" + request.responseText);
+              console.log("ajax call went wrong:" + error);
+            }
+          });
+          
           $('#ModalInputBarangMasuk #xid_barang_keluar').val(data.id_barang_keluar);
+          $('#ModalInputBarangMasuk #xcurrent_id_barang').val(data.id_barang);
           $('#ModalInputBarangMasuk #xid_barang').val(data.id_barang).trigger('change');
           $('#ModalInputBarangMasuk #xtanggal').val(data.tanggal);
           $('#ModalInputBarangMasuk #xjumlah').val(data.jumlah);
-
+          
           // Re-init all feather icons
           feather.replace();
           
