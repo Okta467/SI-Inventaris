@@ -257,7 +257,6 @@ else :
       $(document).ready(function() {
 
         const handleStokBarangZero = function (isStokZero = false, barangDisplayText = '') {
-          console.log(barangDisplayText);
           if (isStokZero) {
             $('#xjumlah').prop('readonly', true);
             
@@ -333,7 +332,7 @@ else :
               }
             },
             error: function(request, status, error) {
-              console.log("ajax call went wrong:" + request.responseText);
+              // console.log("ajax call went wrong:" + request.responseText);
               console.log("ajax call went wrong:" + error);
             }
           });
@@ -358,7 +357,7 @@ else :
           
           Swal.fire({
             title: "Konfirmasi Tindakan?",
-            html: `<div class="mb-1">Hapus data barang masuk: </div><strong>${nama_barang} (Jumlah masuk ${jumlah})?</strong>`,
+            html: `<div class="mb-1">Hapus data barang keluar: </div><strong>${nama_barang} (Jumlah keluar ${jumlah})?</strong>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
