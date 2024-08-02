@@ -28,11 +28,6 @@ $user_logged_in = $_SESSION['nama_pegawai'] ?? $_SESSION['nama_guest'] ?? $_SESS
         Barang
       </a>
       
-      <a class="nav-link <?php if ($current_page === 'barang_masuk') echo 'active' ?>" href="barang_masuk.php?go=barang_masuk">
-        <div class="nav-link-icon"><i data-feather="download"></i></div>
-        Barang Masuk
-      </a>
-      
       <a class="nav-link <?php if ($current_page === 'barang_keluar') echo 'active' ?>" href="barang_keluar.php?go=barang_keluar">
         <div class="nav-link-icon"><i data-feather="upload"></i></div>
         Barang keluar
